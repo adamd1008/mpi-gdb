@@ -73,9 +73,8 @@ void mpigdb_init_func()
    
    sprintf(arg0, "mpi %.02d: xterm", mpiRank);
    sprintf(title, "Rank %.02d", mpiRank);
-   sprintf(gdbCmd, "gdb --pid %d", pid);
-   //sprintf(gdbCmd, "gdb --pid %d -ex \"finish\" -ex \"finish\" "
-   //        "-ex \"set var start = 1\" -ex \"finish\"", pid);
+   sprintf(gdbCmd, "gdb --pid %d -ex \"finish\" -ex \"finish\" "
+           "-ex \"set var start = 1\" -ex \"finish\"", pid);
    /* Automatically unwind the stack back to the user's code (may not work on
     * some archs) */
    
