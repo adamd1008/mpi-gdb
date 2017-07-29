@@ -9,6 +9,10 @@
 
 #include <openmpi/mpi.h>
 
+#ifndef __linux
+#error Unsupported architecture
+#endif
+
 #ifndef NDEBUG
 #define MPI_GDB_INIT(x) mpigdb_init_func(x)
 #else
@@ -47,8 +51,11 @@ void mpigdb_init_func()
    
    sprintf(arg0, "mpi %.02d: xterm", mpiRank);
    sprintf(title, "Rank %.02d", mpiRank);
-   sprintf(gdbCmd, "gdb --pid %d -ex \"finish\" -ex \"finish\" "
-           "-ex \"set var start = 1\"", pid);
+   sprintf(gdbCmd, "gdb --pid %d", pid);
+   //sprintf(gdbCmd, "gdb --pid %d -ex \"finish\" -ex \"finish\" "
+   //        "-ex \"set var start = 1\" -ex \"finish\"", pid);
+   /* Automatically unwind the stack back to the user's code (may not work on
+    * some archs) */
    
    int column = (mpiRank / colSize) * 506;
    int row = (mpiRank % colSize) * 344 + 25;
