@@ -12,26 +12,36 @@ Run your program in the usual way:
 
     mpirun -n 2 ./a.out
 
-In this case, you will see two xterms appear, each attached to each MPI process running in the world communicator.
+In this case, you will see two xterms appear, each running `gdb` attached to each MPI process running in the world communicator. Each `gdb` will automatically attempt to unwind the stack back to your code, at which point they can then be used as normal.
 
-GDB can attach before any code executes after the `MPI_GDB_INIT()` call because of a sleep guard. On modern 64-bit Linux distros, the stack trace below the utility looks like this:
+## How it works
+
+The utility stops execution racing ahead of the `MPI_GDB_INIT()` call with a simple `sleep()` guard:
+
+    while (start == 0)
+      sleep(1);
+
+On modern 64-bit Linux distros using `glibc`, the stack trace below the utility looks like this:
 
     #0  0x00007f5639cc97cd in nanosleep () from /lib64/libc.so.6
     #1  0x00007f5639cc971a in sleep () from /lib64/libc.so.6
     #2  0x0000000000401622 in mpigdb_init_func () at ../../mpi-gdb/mpi_gdb.h:80
 
-GDB naively attempts to unwind the stack back to your code by automatically executing the following commands:
+`gdb` naively attempts to unwind the stack back to your code by automatically executing the following commands:
 
     finish
     finish
     set var start = 1
     finish
 
-GDB can then be used as normal.
+## Limitations
 
-As noted above, this may not work on archiotectures other than x86-based. Tweak as appropriate.
+This code has been written for Linux on x86-based architectures. If the stack is different under `sleep()` on your architecture, the `-ex` arguments supplied to `gdb` will need to be modified as appropriate.
+
+This utility will obviously not work across MPI instances running on different systems.
+
+Although I haven't seen it happen myself, the `start` variable may be optimised out or otherwise made redundant.
 
 ## Disabling `mpi-gdb`
 
 The utility can be disabled by adding the `NDEBUG` preprocessor directive, as is typical during a release build.
-
