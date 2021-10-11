@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2020 Adam Dodd
+Copyright (c) 2021 Adam Dodd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -77,7 +77,7 @@ void mpigdb_init_func()
     sprintf(arg0, "mpi %.02d: xterm", mpiRank);
     sprintf(title, "Rank %.02d", mpiRank);
     sprintf(gdbCmd,
-            "gdb --pid %d -ex \"break mpi_gdb.h:109\" -ex \"continue\" "
+            "gdb --pid %d -ex \"break mpi_gdb.h:108\" -ex \"continue\" "
             "-ex \"set var start = 1\" -ex \"finish\"",
             pid);
  
@@ -105,7 +105,7 @@ void mpigdb_init_func()
     start = 0;
  
     while (start == 0)
-        usleep(10000);
+        usleep(10000); /* GDB breaks here */
 }
 
 #ifdef __cplusplus
